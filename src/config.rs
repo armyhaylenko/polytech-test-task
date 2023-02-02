@@ -63,3 +63,20 @@ pub fn save_provider(provider: &str) -> Result<(), ConfigError> {
     config_file.write_all(format!("{provider}").as_bytes())?;
     Ok(())
 }
+
+/// Parse the api key from the configuration file.
+/// Returns `None` if the file does not follow `key=value\n` format
+/// or such provider does not exist.
+pub fn parse_apikey(apikeys_str: &str, provider: &str) -> Option<String> {
+    let lines = apikeys_str
+        .lines()
+        .map(|line| {
+            let split = line.split('=').collect::<Vec<&str>>();
+            (split[0], split[1])
+        })
+        .collect::<Vec<(&str, &str)>>();
+    lines
+        .into_iter()
+        .find(|(k, _)| *k == provider)
+        .map(|(_, v)| String::from(v))
+}
